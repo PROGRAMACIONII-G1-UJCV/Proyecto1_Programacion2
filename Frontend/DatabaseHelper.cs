@@ -22,7 +22,10 @@ namespace Frontend
         {
             using (var context = CrearContexto())
             {
-                return context.Productos.ToList();
+                return context.Productos
+            .Include(p => p.DetalleFactura) // Carga explícita de la relación
+            .AsNoTracking() // Opcional: mejora rendimiento para solo lectura
+            .ToList();
             }
         }
 
