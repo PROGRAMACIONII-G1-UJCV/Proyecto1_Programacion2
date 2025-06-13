@@ -127,10 +127,10 @@ namespace Frontend
 
             decimal total = subtotal + isv - descuento;
 
-            txtSubTotal.Text = subtotal.ToString("C2");
-            txtISV.Text = isv.ToString("C2");
-            txtDescuento.Text = descuento.ToString("C2");
-            txtTotal.Text = total.ToString("C2");
+            txtSubTotal.Text = subtotal.ToString("N2");
+            txtISV.Text = isv.ToString("N2");
+            txtDescuento.Text = descuento.ToString("N2");
+            txtTotal.Text = total.ToString("N2");
         }
 
         private void btnGuardarFactura_Click(object sender, EventArgs e)
@@ -143,18 +143,44 @@ namespace Frontend
                     return;
                 }
 
+                // Conversión segura de valores numéricos
+                decimal subtotal, isv, descuento, total;
+
+                if (!decimal.TryParse(txtSubTotal.Text.Replace("$", "").Replace(",", ""), out subtotal))
+                {
+                    MessageBox.Show("El subtotal no tiene un formato válido");
+                    return;
+                }
+
+                if (!decimal.TryParse(txtISV.Text.Replace("$", "").Replace(",", ""), out isv))
+                {
+                    MessageBox.Show("El ISV no tiene un formato válido");
+                    return;
+                }
+
+                if (!decimal.TryParse(txtDescuento.Text.Replace("$", "").Replace(",", ""), out descuento))
+                {
+                    MessageBox.Show("El descuento no tiene un formato válido");
+                    return;
+                }
+
+                if (!decimal.TryParse(txtTotal.Text.Replace("$", "").Replace(",", ""), out total))
+                {
+                    MessageBox.Show("El total no tiene un formato válido");
+                    return;
+                }
+
                 var factura = new Facturas
                 {
                     Fecha = dtpFecha.Value,
                     IdCliente = ((Clientes)cmbCliente.SelectedItem).IdCliente,
                     IdEmpleado = ((Empleados)cmbEmpleado.SelectedItem).IdEmpleado,
-                    SubTotal = decimal.Parse(txtSubTotal.Text.Replace("$", "").Replace(",", "")),
-                    ISV = decimal.Parse(txtISV.Text.Replace("$", "").Replace(",", "")),
-                    Descuento = decimal.Parse(txtDescuento.Text.Replace("$", "").Replace(",", "")),
-                    TotalPagar = decimal.Parse(txtTotal.Text.Replace("$", "").Replace(",", ""))
+                    SubTotal = subtotal,
+                    ISV = isv,
+                    Descuento = descuento,
+                    TotalPagar = total,
+                    DetalleFactura = detalles
                 };
-
-                factura.DetalleFactura.ToList().AddRange(detalles);
 
                 int idFactura = dbHelper.AgregarFactura(factura);
                 if (idFactura > 0)

@@ -263,6 +263,13 @@ namespace Frontend
             {
                 using (var context = CrearContexto())
                 {
+                    // Validación adicional de valores
+                    if (factura.SubTotal < 0 || factura.ISV < 0 || factura.Descuento < 0 || factura.TotalPagar < 0)
+                    {
+                        MessageBox.Show("Los valores numéricos no pueden ser negativos");
+                        return -1;
+                    }
+
                     context.Facturas.Add(factura);
                     context.SaveChanges();
                     return factura.IdFactura;
@@ -270,7 +277,7 @@ namespace Frontend
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al agregar factura: {ex.Message}");
+                MessageBox.Show($"Error al agregar factura: {ex.Message}\n{ex.InnerException?.Message}");
                 return -1;
             }
         }
