@@ -23,8 +23,8 @@ namespace Frontend
             using (var context = CrearContexto())
             {
                 return context.Productos
-            .Include(p => p.DetalleFactura) // Carga explícita de la relación
-            .AsNoTracking() // Opcional: mejora rendimiento para solo lectura
+            .Include(p => p.DetalleFactura) 
+            .AsNoTracking() 
             .ToList();
             }
         }
@@ -163,11 +163,26 @@ namespace Frontend
         #endregion
 
         #region Métodos para Empleados
-        public List<Empleados> ObtenerEmpleados()
+        public List<Empleados> ObtenerEmpleados(bool includeFacturas = false)
         {
             using (var context = CrearContexto())
             {
-                return context.Empleados.ToList();
+                var query = context.Empleados.AsQueryable();
+
+                if (includeFacturas)
+                {
+                    query = query.Include(e => e.Facturas);
+                }
+
+                return query.AsNoTracking().ToList();
+            }
+        }
+
+        public bool EmpleadoTieneFacturas(int idEmpleado)
+        {
+            using (var context = CrearContexto())
+            {
+                return context.Facturas.Any(f => f.IdEmpleado == idEmpleado);
             }
         }
 
@@ -263,7 +278,7 @@ namespace Frontend
             {
                 using (var context = CrearContexto())
                 {
-                    // Validación adicional de valores
+                    
                     if (factura.SubTotal < 0 || factura.ISV < 0 || factura.Descuento < 0 || factura.TotalPagar < 0)
                     {
                         MessageBox.Show("Los valores numéricos no pueden ser negativos");
@@ -302,6 +317,47 @@ namespace Frontend
             }
         }
         #endregion
+
+        public bool ExisteCliente(string documento)
+        {
+            using (var context = CrearContexto())
+            {
+                return context.Clientes.Any(c => c.Documento == documento);
+            }
+        }
+
+        public bool ClienteTieneFacturas(int idCliente)
+        {
+            using (var context = CrearContexto())
+            {
+                return context.Facturas.Any(f => f.IdCliente == idCliente);
+            }
+        }
+        public bool ExisteCodigoEmpleado(string codigo)
+        {
+            using (var context = CrearContexto())
+            {
+                return context.Empleados.Any(e => e.Codigo == codigo);
+            }
+        }
+
+        public bool ExisteDocumentoEmpleado(string documento)
+        {
+            using (var context = CrearContexto())
+            {
+                return context.Empleados.Any(e => e.Documento == documento);
+            }
+        }
+        public bool ExisteProducto(string codigo)
+        {
+            using (var context = CrearContexto())
+            {
+                return context.Productos.Any(p => p.Codigo == codigo);
+            }
+
+        }
+
+
     }
 
 }

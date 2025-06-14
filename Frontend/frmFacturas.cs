@@ -143,7 +143,7 @@ namespace Frontend
                     return;
                 }
 
-                // Conversión segura de valores numéricos
+                
                 decimal subtotal, isv, descuento, total;
 
                 if (!decimal.TryParse(txtSubTotal.Text.Replace("$", "").Replace(",", ""), out subtotal))
