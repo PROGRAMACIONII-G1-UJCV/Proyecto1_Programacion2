@@ -26,7 +26,8 @@ namespace Frontend
 
         private void ConfigurarControles()
         {
-
+            txtStock.Validating += new CancelEventHandler(ValidarStock);
+            txtPrecio.Validating += new CancelEventHandler(ValidarPrecio);
             txtCodigo.Validating += new CancelEventHandler(ValidarCodigo);
             txtNombre.Validating += new CancelEventHandler(ValidarNombre);
         }
@@ -48,7 +49,23 @@ namespace Frontend
                 e.Cancel = true;
             }
         }
-       
+        private void ValidarPrecio(object sender, CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtPrecio.Text) || !decimal.TryParse(txtPrecio.Text, out decimal precio) || precio <= 0)
+            {
+                MessageBox.Show("El precio debe ser un número mayor a cero", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Cancel = true;
+            }
+        }
+        private void ValidarStock(object sender, CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtStock.Text) || !int.TryParse(txtStock.Text, out int stock) || stock < 0)
+            {
+                MessageBox.Show("El stock debe ser un número entero no negativo", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Cancel = true;
+            }
+        }
+
         private void ValidarCodigo(object sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCodigo.Text))

@@ -23,8 +23,13 @@ namespace Frontend
         {
             InitializeComponent();
             CargarDatosIniciales();
+            ConfigurarControles();
         }
+        private void ConfigurarControles()
+        {
+            txtSubTotal.Validating += new CancelEventHandler(ValidarCantidad);
 
+        }
         private void CargarDatosIniciales()
         {
             clientes = dbHelper.ObtenerClientes();
@@ -44,6 +49,14 @@ namespace Frontend
             cmbProducto.ValueMember = "IdProducto";
 
             dtpFecha.Value = DateTime.Now;
+        }
+        private void ValidarCantidad(object sender, CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCantidad.Text) || !int.TryParse(txtCantidad.Text, out int cantidad) || cantidad <= 0)
+            {
+                MessageBox.Show("La cantidad debe ser un número mayor a cero", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Cancel = true;
+            }
         }
 
         private void btnAgregarProducto_Click(object sender, EventArgs e)
