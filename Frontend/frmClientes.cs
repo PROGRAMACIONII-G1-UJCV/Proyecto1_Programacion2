@@ -35,16 +35,8 @@ namespace Frontend
 
         private void CargarClientes()
         {
-            try
-            {
-                clientes = dbHelper.ObtenerClientes();
-                dgvClientes.AutoGenerateColumns = false;
-                dgvClientes.DataSource = new BindingList<Clientes>(clientes);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al cargar clientes: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            clientes = dbHelper.ObtenerClientes();
+            dgvClientes.DataSource = clientes;
         }
 
         
@@ -133,6 +125,12 @@ namespace Frontend
                 MessageBox.Show("El nombre solo puede contener letras y espacios", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 e.Cancel = true;
             }
+            else if (txtNombre.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El nombre no puede exceder los 50 caracteres", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Cancel = true;
+            }
+
         }
 
         

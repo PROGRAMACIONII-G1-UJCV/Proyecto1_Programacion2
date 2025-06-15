@@ -23,6 +23,11 @@ namespace Frontend
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(txtIdFactura.Text))
+                {
+                    MessageBox.Show("Por favor, ingrese un ID de factura", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
                 int idFactura = int.Parse(txtIdFactura.Text);
                 var factura = dbHelper.BuscarFacturaPorId(idFactura);
 

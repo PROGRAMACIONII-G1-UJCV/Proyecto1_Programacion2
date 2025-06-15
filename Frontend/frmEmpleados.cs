@@ -15,12 +15,11 @@ namespace Frontend
     public partial class frmEmpleados : Form
     {
         private DatabaseHelper dbHelper = new DatabaseHelper();
-        private BindingList<Empleados> empleados;
+        private List<Empleados> empleados = new List<Empleados>();
 
         public frmEmpleados()
         {
             InitializeComponent();
-            ConfigurarDataGridView();
             CargarEmpleados();
             ConfigurarControles();
         }
@@ -34,47 +33,10 @@ namespace Frontend
             txtCodigo.Validating += new CancelEventHandler(ValidarCodigo);
         }
 
-        private void ConfigurarDataGridView()
-        {
-            dgvEmpleados.AutoGenerateColumns = false;
-            dgvEmpleados.Columns.Clear();
-
-            
-            dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "Codigo",
-                HeaderText = "Código"
-            });
-
-            dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "Nombre",
-                HeaderText = "Nombre"
-            });
-
-            dgvEmpleados.Columns.Add(new DataGridViewTextBoxColumn()
-            {
-                DataPropertyName = "Puesto",
-                HeaderText = "Puesto"
-            });
-
-            
-        }
-
         private void CargarEmpleados()
         {
-            try
-            {
-                
-                var listaEmpleados = dbHelper.ObtenerEmpleados(includeFacturas: false);
-                empleados = new BindingList<Empleados>(listaEmpleados);
-                dgvEmpleados.DataSource = empleados;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error al cargar empleados: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            empleados = dbHelper.ObtenerEmpleados();
+            dgvEmpleados.DataSource = empleados;
         }
         private void ValidarDocumento(object sender, CancelEventArgs e)
         {
@@ -131,6 +93,16 @@ namespace Frontend
                 MessageBox.Show("Este código ya está en uso", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtCodigo.Focus();
             }
+            else if (!Regex.IsMatch(codigo, @"^[a-zA-Z0-9]+$"))
+            {
+                MessageBox.Show("El código solo puede contener letras y números", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+            }
+            else if (string.IsNullOrWhiteSpace(codigo))
+            {
+                MessageBox.Show("El código no puede estar vacío", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+            }
         }
 
         private void btnAgregar_Click(object sender, EventArgs e)
@@ -139,6 +111,13 @@ namespace Frontend
 
             try
             {
+                if (dbHelper.ExisteDocumentoEmpleado(txtDocumento.Text.Trim()))
+                {
+                    MessageBox.Show("Ya existe un empleado con este documento", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtDocumento.Focus();
+                    return;
+                }
                 var empleado = new Empleados
                 {
                     Codigo = txtCodigo.Text.Trim(),
